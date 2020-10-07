@@ -1,9 +1,12 @@
 package gui;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import db.DbException;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
@@ -20,11 +23,17 @@ import model.services.DepartmentService;
 public class DepartmentFormController implements Initializable {
 
 	// Dependencia para Department
+	
 	private Department entity;
 
 	private DepartmentService service;
+	
+	//Listas
+	
+	private List<DataChangeListener> dataChangeListeners = new ArrayList<>(); //Permiti que outros objetos se inscrevam na lista e receberem o evento 
 
 	// Atributos -> Elementos no SceneBuilder
+	
 	@FXML
 	private TextField txtId;
 
@@ -49,6 +58,10 @@ public class DepartmentFormController implements Initializable {
 	public void setDepartmentService(DepartmentService service) { // Instanciação do DepartmentService
 		this.service = service;
 	}
+	
+	public void subscribeDataChangeListener(DataChangeListener listener) { // Método para adicionar na lista
+		dataChangeListeners.add(listener);
+	}
 
 	@FXML
 	public void onBtSaveAction(ActionEvent event) { // Tratar os eventos dos botões
@@ -62,6 +75,7 @@ public class DepartmentFormController implements Initializable {
 		try {
 			entity = getFormData();
 			service.saveOrUpdate(entity); // Salver no banco de dados
+			notifyDataChangeListener(); //Notificar Listeners
 			Utils.currentStage(event).close();
 		}
 		catch (DbException e) {
@@ -69,6 +83,13 @@ public class DepartmentFormController implements Initializable {
 		}
 	}
 	
+	private void notifyDataChangeListener() { //Método para notficar os Listeners
+		for(DataChangeListener listener : dataChangeListeners) {
+			listener.onDataChanged();			
+		}
+		
+	}
+
 	private Department getFormData() { //Responsavel por "pegar" os dados do formulario e "guardar" no obj
 		Department obj = new Department();
 		
@@ -76,7 +97,6 @@ public class DepartmentFormController implements Initializable {
 		obj.setName(txtName.getText());
 		
 		return obj;
-	
 	}
 
 	@FXML
