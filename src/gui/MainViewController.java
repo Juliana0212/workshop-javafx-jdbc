@@ -35,7 +35,7 @@ public class MainViewController implements Initializable {
 
 	@FXML
 	public void onMenuItemDepartmentAction() {
-		//Função no parametro -> expressão lambda
+		//Função como parametro -> expressão lambda
 		loadView("/gui/DepartmentList.fxml", (DepartmentListController controller) -> {
 			controller.setDepartmentService(new DepartmentService());
 			controller.updateTableView();			
@@ -44,7 +44,7 @@ public class MainViewController implements Initializable {
 
 	@FXML
 	public void onMenuItemAboutAction() {
-		//Função no parametro -> expressão lambda
+		//Função como parametro -> expressão lambda
 		loadView("/gui/About.fxml", x -> {});
 
 	}
@@ -68,6 +68,7 @@ public class MainViewController implements Initializable {
 			mainVBox.getChildren().add(mainMenu); 
 			mainVBox.getChildren().addAll(newVBox.getChildren());
 			
+			//Executa a ação
 			T controller = loader.getController();
 			initializingAction.accept(controller);		
 					
