@@ -8,10 +8,20 @@ import model.entities.Department;
 
 public class DepartmentService {
 
-	// Acessar bancos de dados atraves do dao
-	private DepartmentDao dao = DaoFactory.createDepartmentDao();
+	private DepartmentDao dao = DaoFactory.createDepartmentDao(); // Acessar bancos de dados atraves do dao
 
-	public List<Department> findAll() {
+	// Métodos
+	
+	public List<Department> findAll() { // Acessar bancos de dados atraves do dao
 		return dao.findAll();
+	}
+	
+	public void saveOrUpdate (Department obj) { //Inserir ou atualizar o Department existente
+		if (obj.getId() == null) {
+			dao.insert(obj);
+		}
+		else {
+			dao.update(obj);
+		}
 	}
 }
