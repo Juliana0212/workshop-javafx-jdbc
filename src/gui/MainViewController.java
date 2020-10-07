@@ -20,6 +20,7 @@ import model.services.DepartmentService;
 
 public class MainViewController implements Initializable {
 
+	//Atributos -> Elementos no SceneBuilder
 	@FXML
 	private MenuItem menuItemSeller;
 
@@ -29,12 +30,12 @@ public class MainViewController implements Initializable {
 	@FXML
 	private MenuItem menuItemAbout;
 
+	//Metodos 
 	public void onMenuItemSellerAction() {
-
 	}
-
+	
 	@FXML
-	public void onMenuItemDepartmentAction() {
+	public void onMenuItemDepartmentAction() { 
 		//Função como parametro -> expressão lambda
 		loadView("/gui/DepartmentList.fxml", (DepartmentListController controller) -> {
 			controller.setDepartmentService(new DepartmentService());

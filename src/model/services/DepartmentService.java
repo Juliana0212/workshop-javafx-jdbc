@@ -8,6 +8,7 @@ import model.entities.Department;
 
 public class DepartmentService {
 
+	// Acessar bancos de dados atraves do dao
 	private DepartmentDao dao = DaoFactory.createDepartmentDao();
 
 	public List<Department> findAll() {

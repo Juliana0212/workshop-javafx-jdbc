@@ -28,6 +28,7 @@ import model.services.DepartmentService;
 
 public class DepartmentListController implements Initializable {
 
+    //Atributos -> Elementos no SceneBuilder
 	private DepartmentService service;
 
 	@FXML
@@ -44,10 +45,12 @@ public class DepartmentListController implements Initializable {
 
 	private ObservableList<Department> obsList;
 
+	//Metodos
+	
 	@FXML
-	public void onBtNewAction(ActionEvent event) {
+	public void onBtNewAction(ActionEvent event) { //Tratar os eventos dos botões
 		Stage parentStage = Utils.currentStage(event);
-		//Mostrando o caminho para o metodo onBtNewAction
+		// Mostrando o caminho para o metodo onBtNewAction
 		createDialogForm("/gui/DepartmentForm.fxml", parentStage);
 	}
 
@@ -60,12 +63,12 @@ public class DepartmentListController implements Initializable {
 		initializeNodes();
 	}
 
-	// Iniciar o comportamento das colunas //
+	// Iniciar o comportamento das colunas 
 	private void initializeNodes() {
 		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
 		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-		// tableview acompanhar a altura da janela
+		// tableview acompanhar a altura da janela 
 		Stage stage = (Stage) Main.getMainScene().getWindow();
 		tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());
 	}
