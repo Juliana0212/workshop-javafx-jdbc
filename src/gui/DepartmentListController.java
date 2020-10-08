@@ -9,6 +9,7 @@ import application.Main;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -18,6 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -29,8 +31,8 @@ import model.services.DepartmentService;
 
 public class DepartmentListController implements Initializable, DataChangeListener {
 
-    //Atributos -> Elementos no SceneBuilder
-	
+	// Atributos -> Elementos no SceneBuilder
+
 	private DepartmentService service;
 
 	@FXML
@@ -43,18 +45,21 @@ public class DepartmentListController implements Initializable, DataChangeListen
 	private TableColumn<Department, String> tableColumnName;
 
 	@FXML
+	private TableColumn<Department, Department> tableColumnEDIT;
+
+	@FXML
 	private Button btNew;
 
 	private ObservableList<Department> obsList;
 
-	//Métodos
-	
+	// Métodos
+
 	@FXML
-	public void onBtNewAction(ActionEvent event) { //Tratar os eventos dos botões
+	public void onBtNewAction(ActionEvent event) { // Tratar os eventos dos botões
 		Stage parentStage = Utils.currentStage(event);
 		Department obj = new Department();
 		// Mostrando o caminho para o metodo onBtNewAction
-		createDialogForm(obj,"/gui/DepartmentForm.fxml", parentStage);
+		createDialogForm(obj, "/gui/DepartmentForm.fxml", parentStage);
 	}
 
 	public void setDepartmentService(DepartmentService service) {
@@ -66,12 +71,12 @@ public class DepartmentListController implements Initializable, DataChangeListen
 		initializeNodes();
 	}
 
-	// Iniciar o comportamento das colunas 
+	// Iniciar o comportamento das colunas
 	private void initializeNodes() {
 		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
 		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-		// tableview acompanhar a altura da janela 
+		// tableview acompanhar a altura da janela
 		Stage stage = (Stage) Main.getMainScene().getWindow();
 		tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());
 	}
@@ -83,6 +88,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
 		List<Department> list = service.findAll();
 		obsList = FXCollections.observableArrayList(list);
 		tableViewDepartment.setItems(obsList);
+		initEditButtons();
 	}
 
 	// Janela formulario Department
@@ -90,7 +96,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
-			
+
 			DepartmentFormController controller = loader.getController();
 			controller.setDepartment(obj);
 			controller.setDepartmentService(new DepartmentService());
@@ -114,6 +120,25 @@ public class DepartmentListController implements Initializable, DataChangeListen
 	@Override
 	public void onDataChanged() {
 		updateTableView();
-		
 	}
+
+	private void initEditButtons() {
+		tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+		tableColumnEDIT.setCellFactory(param -> new TableCell<Department, Department>() {
+			private final Button button = new Button("edit");
+
+			@Override
+			protected void updateItem(Department obj, boolean empty) {
+				super.updateItem(obj, empty);
+				if (obj == null) {
+					setGraphic(null);
+					return;
+				}
+				setGraphic(button);
+				button.setOnAction(
+						event -> createDialogForm(obj, "/gui/DepartmentForm.fxml", Utils.currentStage(event)));
+			}
+		});
+	}
+
 }

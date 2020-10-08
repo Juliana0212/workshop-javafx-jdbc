@@ -33,7 +33,7 @@
                   <Insets top="10.0" />
                </GridPane.margin>
             </TextField>
-            <Label textFill="#f80606" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Label textFill="RED" GridPane.columnIndex="2" GridPane.rowIndex="1" />
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                <children>
                   <Button fx:id="btSave" mnemonicParsing="false" onAction="#onBtSaveAction" text="Save" />

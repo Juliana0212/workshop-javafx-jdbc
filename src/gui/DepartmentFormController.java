@@ -3,7 +3,9 @@ package gui;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import db.DbException;
 import gui.listeners.DataChangeListener;
@@ -18,22 +20,24 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entities.Department;
+import model.exceptions.ValidationException;
 import model.services.DepartmentService;
 
 public class DepartmentFormController implements Initializable {
 
 	// Dependencia para Department
-	
+
 	private Department entity;
 
 	private DepartmentService service;
-	
-	//Listas
-	
-	private List<DataChangeListener> dataChangeListeners = new ArrayList<>(); //Permiti que outros objetos se inscrevam na lista e receberem o evento 
+
+	// Listas
+
+	private List<DataChangeListener> dataChangeListeners = new ArrayList<>(); // Permiti que outros objetos se inscrevam
+																				// na lista e receberem o evento
 
 	// Atributos -> Elementos no SceneBuilder
-	
+
 	@FXML
 	private TextField txtId;
 
@@ -58,7 +62,7 @@ public class DepartmentFormController implements Initializable {
 	public void setDepartmentService(DepartmentService service) { // Instanciação do DepartmentService
 		this.service = service;
 	}
-	
+
 	public void subscribeDataChangeListener(DataChangeListener listener) { // Método para adicionar na lista
 		dataChangeListeners.add(listener);
 	}
@@ -66,36 +70,47 @@ public class DepartmentFormController implements Initializable {
 	@FXML
 	public void onBtSaveAction(ActionEvent event) { // Tratar os eventos dos botões
 		if (entity == null) {
-			throw new IllegalStateException ("Entity was null");
+			throw new IllegalStateException("Entity was null");
 		}
 		if (service == null) {
-			throw new IllegalStateException ("Service was null");
+			throw new IllegalStateException("Service was null");
 		}
-		
+
 		try {
 			entity = getFormData();
 			service.saveOrUpdate(entity); // Salver no banco de dados
-			notifyDataChangeListener(); //Notificar Listeners
+			notifyDataChangeListener(); // Notificar Listeners
 			Utils.currentStage(event).close();
-		}
-		catch (DbException e) {
+		} catch (ValidationException e) {
+			setErrorMessages(e.getErrors());
+		} catch (DbException e) {
 			Alerts.showAlert("Error saving object", null, e.getMessage(), AlertType.ERROR);
 		}
 	}
-	
-	private void notifyDataChangeListener() { //Método para notficar os Listeners
-		for(DataChangeListener listener : dataChangeListeners) {
-			listener.onDataChanged();			
+
+	private void notifyDataChangeListener() { // Método para notficar os Listeners
+		for (DataChangeListener listener : dataChangeListeners) {
+			listener.onDataChanged();
 		}
-		
+
 	}
 
-	private Department getFormData() { //Responsavel por "pegar" os dados do formulario e "guardar" no obj
+	private Department getFormData() { // Responsavel por "pegar" os dados do formulario e "guardar" no obj
 		Department obj = new Department();
-		
+
+		ValidationException exception = new ValidationException("Validation error");
+
 		obj.setId(Utils.tryParseToInt(txtId.getText()));
+
+		if (txtName.getText() == null || txtName.getText().trim().equals("")) {
+			exception.addError("name", "Field can't be empty");
+		}
 		obj.setName(txtName.getText());
-		
+
+		if (exception.getErrors().size() > 0) {
+			throw exception;
+		}
+
 		return obj;
 	}
 
@@ -105,12 +120,13 @@ public class DepartmentFormController implements Initializable {
 	}
 
 	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
+	public void initialize(URL url, ResourceBundle rb) {
+		initializeNodes();
 	}
 
 	private void initializeNodes() { // Restrições Id, Name
 		Constraints.setTextFieldInteger(txtId);
-		Constraints.setTextFieldMaxLength(txtName, 12);
+		Constraints.setTextFieldMaxLength(txtName, 30);
 	}
 
 	public void updateFormData() { // Responsavel por popular cxs do formulario atraves do Department entity
@@ -121,4 +137,11 @@ public class DepartmentFormController implements Initializable {
 		txtName.setText(entity.getName());
 	}
 
+	private void setErrorMessages(Map<String, String> errors) {
+		Set<String> fields = errors.keySet();
+		
+		if (fields.contains("name")) {
+			labelErrorName.setText(errors.get("name"));
+		}
+	}
 }
