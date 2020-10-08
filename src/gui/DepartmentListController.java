@@ -2,6 +2,8 @@ package gui;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -22,6 +24,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -29,6 +32,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import model.entities.Department;
 import model.services.DepartmentService;
 
@@ -96,7 +100,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
 		tableViewDepartment.setItems(obsList);
 		initEditButtons();
 		initRemoveButtons();
-		
+
 	}
 
 	// Janela formulario Department
@@ -170,17 +174,16 @@ public class DepartmentListController implements Initializable, DataChangeListen
 	}
 
 	private void removeEntity(Department obj) {
-		Optional <ButtonType> result = Alerts.showConfirmation("Confirmation", "Are you sure to delete?");
-		
+		Optional<ButtonType> result = Alerts.showConfirmation("Confirmation", "Are you sure to delete?");
+
 		if (result.get() == ButtonType.OK) {
 			if (service == null) {
 				throw new IllegalStateException("Service was null");
 			}
 			try {
-			service.remove(obj);
-			updateTableView();
-			}
-			catch (DbIntegrityException e) {
+				service.remove(obj);
+				updateTableView();
+			} catch (DbIntegrityException e) {
 				Alerts.showAlert("Error remove object", null, e.getMessage(), AlertType.ERROR);
 			}
 		}
